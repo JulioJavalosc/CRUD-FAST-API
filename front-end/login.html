@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión</title>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+</head>
+<body>
+
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <div class="fadeIn first">
+      <h2>Iniciar Sesión</h2>
+    </div>
+
+    <form id="loginForm">
+      <input type="text" id="login" class="fadeIn second" name="email" placeholder="Correo Electrónico">
+      <input type="text" id="password" class="fadeIn third" name="password" placeholder="Contraseña">
+      <input type="submit" class="fadeIn fourth" id="loginButton" value="Iniciar Sesión">
+    </form>
+  </div>
+</div>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById("loginForm").addEventListener('submit', async function (event) {
+      event.preventDefault(); 
+
+      let email = document.getElementById("login").value;
+      let password = document.getElementById("password").value;
+      let data = {
+        email: email,
+        password: password
+      };
+
+      try {
+        let response = await fetch('http://localhost:8000/users/validate/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (response.ok) {
+          let result = await response.json();
+          alert("Bienvenido, " + result.name);
+        } else {
+          alert("Usuario o contraseña incorrectos");
+        }
+      } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+        alert("Ocurrió un error al intentar iniciar sesión");
+      }
+    });
+  });
+</script>
+
+</body>
+</html>
