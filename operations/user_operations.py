@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models import User
-from schemas import UserCreate, UserUpdate, UserValidate
+from schemas.user import UserCreate, UserUpdate, UserValidate
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 10):
