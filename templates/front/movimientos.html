@@ -1,0 +1,39 @@
+{% extends "front/base.html" %}
+
+{% block title %}Movimientos de Stock{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Movimientos de Stock</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>ID</th>
+                <th>Cantidad</th>
+                <th>Fecha</th>
+                <th>Tipo de Movimiento</th>
+                <th>Producto</th>
+                <th>Usuario</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for movimiento in movimientos %}
+            <tr class="{% if movimiento.Tipo_Movimiento == 1 %}table-success{% elif movimiento.Tipo_Movimiento == 2 %}table-danger{% endif %}">
+                <td>{{ movimiento.id }}</td>
+                <td>{{ movimiento.Cantidad }}</td>
+                <td>{{ movimiento.Fecha }}</td>
+                <td>
+                    {% if movimiento.Tipo_Movimiento == 1 %}
+                        <span class="badge badge-success">Entrada</span>
+                    {% elif movimiento.Tipo_Movimiento == 2 %}
+                        <span class="badge badge-danger">Salida</span>
+                    {% endif %}
+                </td>
+                <td>{{ movimiento.NombreProducto }}</td>
+                <td>{{movimiento.NombreUsuario}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

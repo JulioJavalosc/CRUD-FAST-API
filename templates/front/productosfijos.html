@@ -1,0 +1,151 @@
+{% extends "front/base.html" %}
+
+{% block title %}Gestión de Productos Fijos{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Gestión de Productos Fijos</h1>
+
+    <!-- Botón para abrir modal -->
+    <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#productoModal"
+        onclick="abrirModalNuevo()">Nuevo Producto</button>
+
+    <div class="table-responsive">
+        <table class="table table-bordered" id="productosTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="productosBody">
+                <!-- Se llena con JS -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="productoModal" tabindex="-1" role="dialog" aria-labelledby="productoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <form id="productoForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="productoModalLabel">Agregar Producto</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="productoId">
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <input type="text" class="form-control" id="descripcion" required>
+                </div>
+                <div class="form-group">
+                    <label for="precio">Precio</label>
+                    <input type="number" class="form-control" id="precio" required>
+                </div>
+                <div class="form-group">
+                    <label for="stock">Stock</label>
+                    <input type="number" class="form-control" id="stock" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Pasar el idUsuario desde Jinja2 al JavaScript
+    const userId = {{ user.id }};  // Inyectado desde el backend
+
+    const PRODUCTOS_URL = "/productos-fijos/";
+
+    document.addEventListener("DOMContentLoaded", getProductos);
+    const form = document.getElementById("productoForm");
+
+    form.addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    const id = document.getElementById("productoId").value;
+    const data = {
+        Descripcion: document.getElementById("descripcion").value,
+        Precio: parseFloat(document.getElementById("precio").value),
+        Stock: parseInt(document.getElementById("stock").value),
+        idUsuario: userId  // Usar el idUsuario pasado desde Jinja2
+    };
+
+    if (id) {
+        // Actualizar el stock usando la nueva ruta
+        fetch(`/productos-fijos/actualizar-stock/${id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nueva_cantidad: data.Stock,  // Enviar la nueva cantidad de stock
+                usuario_id: data.idUsuario  // Enviar el ID del usuario
+            })
+        }).then(getProductos).then(() => $('#productoModal').modal('hide'));
+    } else {
+        // Crear un nuevo producto (sin cambios aquí)
+        fetch(PRODUCTOS_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(getProductos).then(() => $('#productoModal').modal('hide'));
+    }
+
+    form.reset();
+    document.getElementById("productoId").value = "";
+});
+
+    function getProductos() {
+        fetch(PRODUCTOS_URL)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById("productosBody");
+                tbody.innerHTML = "";
+                data.forEach(producto => {
+                    const row = `<tr>
+                        <td>${producto.idProducto}</td>
+                        <td>${producto.Descripcion}</td>
+                        <td>${producto.Precio}</td>
+                        <td>${producto.Stock}</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm" onclick="abrirModalEditar(${producto.idProducto}, '${producto.Descripcion}', ${producto.Precio}, ${producto.Stock})">Editar</button>
+                            <button class="btn btn-danger btn-sm" onclick="deleteProducto(${producto.idProducto})">Eliminar</button>
+                        </td>
+                    </tr>`;
+                    tbody.insertAdjacentHTML("beforeend", row);
+                });
+            });
+    }
+
+    function abrirModalNuevo() {
+        form.reset();
+        document.getElementById("productoId").value = "";
+        document.getElementById("productoModalLabel").innerText = "Agregar Producto";
+    }
+
+    function abrirModalEditar(id, descripcion, precio, stock) {
+        document.getElementById("productoId").value = id;
+        document.getElementById("descripcion").value = descripcion;
+        document.getElementById("precio").value = precio;
+        document.getElementById("stock").value = stock;
+        document.getElementById("productoModalLabel").innerText = "Editar Producto";
+        $('#productoModal').modal('show');
+    }
+
+    function deleteProducto(id) {
+        if (confirm("¿Seguro que deseas eliminar este producto?")) {
+            fetch(PRODUCTOS_URL + id, { method: "DELETE" })
+                .then(getProductos);
+        }
+    }
+</script>
+{% endblock %}

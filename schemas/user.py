@@ -1,28 +1,37 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from typing import Optional, List
 
 
-class UserCreate(BaseModel):
-    name: str
-    email: str
-    password:str
+class UsuarioCreate(BaseModel):
+    Nombre: str
+    telefono: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: str
+    Tipo_Usuarios_id: int
 
 
-class UserResponse(BaseModel):
+class UsuarioResponse(BaseModel):
     id: int
-    name: str
-    email: str
+    Nombre: str
+    telefono: Optional[str] = None
+    email: Optional[str] = None
+    Tipo_Usuarios_id: int
+
     class Config:
         from_attributes = True
 
 
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    email: Optional[str] = None
+class UsuarioUpdate(BaseModel):
+    Nombre: Optional[str] = None
+    telefono: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    Tipo_Usuarios_id: Optional[int] = None
 
-class UserValidate(BaseModel):
-    name: str
+
+class UsuarioValidate(BaseModel):
+    email: str
     password: str
-    email:str
+
     class Config:
         from_attributes = True
