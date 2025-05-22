@@ -1,7 +1,30 @@
+from datetime import datetime
 from sqlalchemy import VARCHAR, Boolean, CheckConstraint, Column, ForeignKey, Integer, String,DateTime
 from database import Base
 from sqlalchemy.orm import declarative_base, relationship
 
+
+class LotesSaboresBase(Base):
+    __tablename__ = 'lotes_sabores_base'
+
+    id_lote = Column(Integer, primary_key=True, autoincrement=True)
+    id_sabor = Column(Integer, ForeignKey('Sabores_Base.id_Sabor'), nullable=False)
+    peso_total_gr = Column(Integer, nullable=False)
+    peso_disponible_gr = Column(Integer, nullable=False)
+    fecha_ingreso = Column(DateTime, default=datetime.now())
+    numero_lote = Column(String(45), nullable=True)
+    sabor = relationship("SaboresBase", back_populates="lotes")
+    consumos = relationship("ConsumoLoteHelado", back_populates="lote")
+class ConsumoLoteHelado(Base):
+    __tablename__ = 'consumo_lote_helado'
+
+    id_consumo = Column(Integer, primary_key=True, autoincrement=True)
+    id_detalle_helado = Column(Integer, ForeignKey('Detalle_Helado_Personalizado.idDetalle_Helado_Personalizado'), nullable=False)    
+    id_lote = Column(Integer, ForeignKey('lotes_sabores_base.id_lote'), nullable=False)
+    cantidad_utilizada_gr = Column(Integer, nullable=False)
+
+    lote = relationship("LotesSaboresBase", back_populates="consumos")
+    detalle_helado = relationship("DetalleHeladoPersonalizado", back_populates="consumos_lote")
 
 class TipoUsuarios(Base):#Listo
     __tablename__ = 'Tipo_Usuarios'
@@ -37,7 +60,7 @@ class SaboresBase(Base):#Listo
     id_Sabor = Column(Integer, primary_key=True, autoincrement=True)
     Nombre = Column(String(45), nullable=False)
     Precio = Column(Integer, nullable=False)
-    Stock = Column(Integer, nullable=False)
+    lotes = relationship("LotesSaboresBase", back_populates="sabor")
 
 class ProductosFijos(Base):#Listo
     __tablename__ = 'Productos_Fijos'
@@ -53,6 +76,7 @@ class HeladosPersonalizados(Base):
 
 class DetalleHeladoPersonalizado(Base):
     __tablename__ = 'Detalle_Helado_Personalizado'
+
     idDetalle_Helado_Personalizado = Column(Integer, primary_key=True, autoincrement=True)
     idHelado = Column(Integer, ForeignKey('Helados_Personalizados.idHelado'), nullable=False)
     id_Sabor = Column(Integer, ForeignKey('Sabores_Base.id_Sabor'), nullable=False)
@@ -60,7 +84,7 @@ class DetalleHeladoPersonalizado(Base):
 
     helado_personalizado = relationship("HeladosPersonalizados", backref="detalles")
     sabor_base = relationship("SaboresBase", backref="detalles_helado")
-
+    consumos_lote = relationship("ConsumoLoteHelado", back_populates="detalle_helado")
 class Ventas(Base):
     __tablename__ = 'Ventas'
     idVenta = Column(Integer, primary_key=True, autoincrement=True)
@@ -104,3 +128,5 @@ class MovimientosStock(Base):
     sabor_base = relationship("SaboresBase", backref="movimientos_stock")
     producto_fijo = relationship("ProductosFijos", backref="movimientos_stock")
     usuario = relationship("Usuarios", backref="movimientos_stock")
+
+    

@@ -36,14 +36,32 @@ def create_producto_fijo(db: Session, producto: ProductoFijoCreate):
     return db_producto
 
 
-def update_producto_fijo(db: Session, producto_id: int, producto_data: ProductoFijoUpdate):
+def update_producto_fijo(db: Session, producto_id: int, producto_data: ProductoFijoUpdate, usuario_id: int = None):
     db_producto = db.query(ProductosFijos).filter(ProductosFijos.idProducto == producto_id).first()
-    if db_producto:
-        db_producto.Descripcion = producto_data.Descripcion if producto_data.Descripcion is not None else db_producto.Descripcion
-        db_producto.Precio = producto_data.Precio if producto_data.Precio is not None else db_producto.Precio
-        db_producto.Stock = producto_data.Stock if producto_data.Stock is not None else db_producto.Stock
-        db.commit()
-        db.refresh(db_producto)
+    if not db_producto:
+        raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+    if producto_data.Descripcion:
+        db_producto.Descripcion = producto_data.Descripcion
+    if producto_data.Precio is not None:
+        db_producto.Precio = producto_data.Precio
+    if producto_data.Stock is not None:
+        diferencia = producto_data.Stock - db_producto.Stock
+        db_producto.Stock = producto_data.Stock
+
+        # Registrar movimiento
+        tipo_movimiento = 1 if diferencia > 0 else 2
+        movimiento = MovimientosStock(
+            Cantidad=abs(diferencia),
+            Fecha=datetime.now(),
+            Tipo_Movimiento=tipo_movimiento,
+            idProducto=db_producto.idProducto,
+            idUsuario=usuario_id or 1  # Reemplaza por sesión si es posible
+        )
+        db.add(movimiento)
+
+    db.commit()
+    db.refresh(db_producto)
     return db_producto
 
 

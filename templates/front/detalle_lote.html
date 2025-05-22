@@ -1,0 +1,59 @@
+{% extends "front/base.html" %}
+
+
+{% block title %}Blank Page{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+   
+  <a href="/lotes" class="btn btn-secondary mb-3">&laquo; Volver a lotes</a>
+
+  <h1 class="mb-4">Detalles del Lote</h1>
+
+  <!-- Información del lote -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      Información del Lote
+    </div>
+    <div class="card-body">
+      <p><strong>ID:</strong> {{ lote.id_lote }}</p>
+      <p><strong>Sabor:</strong> {{ lote.sabor.Nombre }}</p>
+      <p><strong>Peso Total:</strong> {{ lote.peso_total_gr }} gr</p>
+      <p><strong>Disponible:</strong> {{ lote.peso_disponible_gr }} gr</p>
+      <p><strong>Fecha Ingreso:</strong> {{ lote.fecha_ingreso.strftime('%d/%m/%Y %H:%M') }}</p>
+      <p><strong>Número de Lote:</strong> {{ lote.numero_lote or '-' }}</p>
+    </div>
+  </div>
+
+  <!-- Consumos del lote -->
+  <h2 class="mb-3">Consumo del Lote</h2>
+  
+  {% if consumos and consumos|length > 0 %}
+    <table class="table table-bordered table-striped">
+      <thead class="table-info">
+        <tr>
+          <th>ID Consumo</th>
+          <th>ID Detalle Helado</th>
+          <th>Cantidad Utilizada (gr)</th>
+          <th>Fecha de Uso</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for consumo in consumos %}
+          <tr>
+            <td>{{ consumo.id_consumo }}</td>
+            <td>{{ consumo.id_detalle_helado }}</td>
+            <td>{{ consumo.cantidad_utilizada_gr }}</td>
+            <td>{{ consumo.lote.fecha_ingreso.strftime('%d/%m/%Y %H:%M') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-info">No hay consumos registrados para este lote.</div>
+  {% endif %}
+
+</div>
+
+   
+{% endblock %}

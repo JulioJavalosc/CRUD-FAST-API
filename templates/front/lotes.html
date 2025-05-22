@@ -1,0 +1,57 @@
+{% extends "front/base.html" %}
+
+
+{% block title %}Blank Page{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="mb-4">Lotes de Sabores</h1>
+  <a href="/lotes/nuevo" class="btn btn-success mb-3">+ Nuevo Lote</a>
+
+
+  {% if lotes and lotes|length > 0 %}
+    <table class="table table-striped table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID Lote</th>
+          <th>Sabor</th>
+          <th>Peso Total (gr)</th>
+          <th>Disponible (gr)</th>
+          <th>% Usado</th>
+          <th>Fecha Ingreso</th>
+          <th>Número de Lote</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lote in lotes %}
+          {% set usado = lote.peso_total_gr - lote.peso_disponible_gr %}
+          {% set porcentaje = (usado / lote.peso_total_gr) * 100 %}
+          <tr>
+            <td>{{ lote.id_lote }}</td>
+            <td>{{ lote.sabor.Nombre }}</td>
+            <td>{{ lote.peso_total_gr }}</td>
+            <td>{{ lote.peso_disponible_gr }}</td>
+            <td>{{ "%.2f"|format(porcentaje) }}%</td>
+            <td>{{ lote.fecha_ingreso.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ lote.numero_lote or '-' }}</td>
+            <td>
+              <a href="/lotes/{{ lote.id_lote }}" class="btn">
+                Ver Detalles
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-warning">No hay lotes registrados.</div>
+  {% endif %}
+
+  <a href="/" class="btn btn-secondary mt-3">&laquo; Volver al inicio</a>
+
+</div>
+
+   
+
+{% endblock %}

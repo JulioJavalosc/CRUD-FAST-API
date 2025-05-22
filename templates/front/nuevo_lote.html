@@ -1,0 +1,39 @@
+{% extends "front/base.html" %}
+
+
+{% block title %}Blank Page{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <a href="/lotes" class="btn btn-secondary mb-3">&laquo; Volver</a>
+
+  <h1 class="mb-4">Registrar Nuevo Lote</h1>
+
+  <form action="/lotes" method="post">
+    <div class="mb-3">
+      <label for="id_sabor" class="form-label">Sabor</label>
+
+      <select name="id_sabor" id="id_sabor" class="form-select" required>
+        {% for sabor in sabores %}
+          <option value="{{ sabor.id_Sabor }}">{{ sabor.Nombre }}</option>
+        {% endfor %}
+      </select>
+            <a href="/sabores-base"><i class="bi bi-plus">Agregar Nuevo Sabor</i></a>
+    </div>
+
+    <div class="mb-3">
+      <label for="peso_total_gr" class="form-label">Peso Total (gr)</label>
+      <input type="number" name="peso_total_gr" id="peso_total_gr" class="form-control" required min="1" />
+    </div>
+
+    <div class="mb-3">
+      <label for="numero_lote" class="form-label">Número de Lote (opcional)</label>
+      <input type="text" name="numero_lote" id="numero_lote" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Lote</button>
+  </form>
+</div>
+
+   
+{% endblock %}
