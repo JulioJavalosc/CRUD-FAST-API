@@ -1,0 +1,41 @@
+{% extends "front/base.html" %}
+
+{% block title %}Crear Usuario{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Crear Nuevo Usuario</h2>
+    <form method="POST" action="/usuarios/crear">
+        <div class="form-group">
+            <label for="Nombre">Nombre</label>
+            <input type="text" name="Nombre" id="Nombre" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="text" name="telefono" id="telefono" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" name="password" id="password" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="Tipo_Usuarios_id">Tipo de Usuario</label>
+            <select name="Tipo_Usuarios_id" id="Tipo_Usuarios_id" class="form-control" required>
+                {% for tipo in tipos_usuarios %}
+                    <option value="{{ tipo.id }}">{{ tipo.Nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar Usuario</button>
+    </form>
+</div>
+{% endblock %}

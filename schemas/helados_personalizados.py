@@ -16,3 +16,16 @@ class HeladoPersonalizadoResponse(BaseModel):
 
 class HeladoPersonalizadoUpdate(BaseModel):
     precio_total: Optional[int] = None
+
+
+from pydantic import BaseModel
+from typing import List
+
+class SaborHelado(BaseModel):
+    id_Sabor: int
+    Cantidad_Bolas: int
+
+class HeladoPersonalizado(BaseModel):
+    sabores: List[SaborHelado]
+    cantidad: int
+    precio: float

@@ -1,0 +1,67 @@
+<!-- Modal Cliente -->
+<div class="modal fade" id="nuevoClienteModal" tabindex="-1" role="dialog" aria-labelledby="nuevoClienteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="nuevoClienteModalLabel">Nuevo Cliente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" class="form-control" id="apellido" name="apellido" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" class="form-control" id="telefono" name="telefono" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Helado Personalizado -->
+<div class="modal fade" id="heladoModal" tabindex="-1" role="dialog" aria-labelledby="heladoModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="heladoModalLabel">Helado Personalizado</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="sabores-container">
+                    <div class="input-group mb-2">
+                        <select name="id_Sabor[]" class="form-control" required>
+                            {% for sabor in sabores %}
+                                <option value="{{ sabor.id_Sabor }}" data-nombre="{{ sabor.Nombre }}" data-precio="{{ sabor.Precio }}">
+                                    {{ sabor.Nombre }} - ${{ sabor.Precio }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" name="Cantidad_Bolas[]" class="form-control" placeholder="Cantidad de Bolas" min="1" required>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger" onclick="this.parentElement.parentElement.remove()">Eliminar</button>
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="agregarSabor()">Agregar Sabor</button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarHelado()">Guardar Helado</button>
+            </div>
+        </div>
+    </div>
+</div>

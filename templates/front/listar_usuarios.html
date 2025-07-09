@@ -1,0 +1,171 @@
+{% extends "front/base.html" %}
+
+{% block title %}Lista de Usuarios{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Lista de Usuarios</h2>
+        <button class="btn btn-success" data-toggle="modal" data-target="#modalCrearUsuario">Crear Nuevo Usuario</button>
+    </div>
+
+    {% if usuarios | length == 0 %}
+        <div class="alert alert-info">No hay usuarios registrados aún.</div>
+    {% else %}
+        <table class="table table-striped table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Tipo de Usuario</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                    <tr>
+                        <td>{{ usuario.id }}</td>
+                        <td>{{ usuario.Nombre }}</td>
+                        <td>{{ usuario.tipo_usuario.Nombre }}</td>
+                        <td>{{ usuario.email }}</td>
+                        <td>{{ usuario.telefono }}</td>
+                        <td>
+                            {% if usuario.activo %}
+                                <span>Activo</span>
+                            {% else %}
+                                <span style="color: red; font-weight: bold;">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-primary"
+                                    data-toggle="modal"
+                                    data-target="#modalEditarUsuario"
+                                    onclick="cargarDatos({{ usuario.id }}, '{{ usuario.Nombre }}', '{{ usuario.telefono }}', '{{ usuario.email }}', {{ usuario.Tipo_Usuarios_id }})">
+                                Editar
+                            </button>
+
+                            {% if usuario.activo %}
+                                <form action="/usuarios/{{ usuario.id }}/desactivar" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-secondary">Desactivar</button>
+                                </form>
+                            {% else %}
+                                <form action="/usuarios/{{ usuario.id }}/activar" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-success">Activar</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+
+<!-- Modal Crear -->
+<div class="modal fade" id="modalCrearUsuario" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form method="POST" action="/usuarios/crear">
+        <div class="modal-header">
+          <h5 class="modal-title">Crear Usuario</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="Nombre">Nombre</label>
+            <input type="text" name="Nombre" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input type="text" name="telefono" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" name="email" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input type="password" name="password" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="Tipo_Usuarios_id">Tipo de Usuario</label>
+            <select name="Tipo_Usuarios_id" class="form-control" required>
+              {% for tipo in tipos_usuarios %}
+                <option value="{{ tipo.id }}">{{ tipo.Nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Editar -->
+<div class="modal fade" id="modalEditarUsuario" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <form id="formEditarUsuario" method="POST">
+        <div class="modal-header">
+          <h5 class="modal-title">Editar Usuario</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="editar-id" name="id">
+          <div class="form-group">
+            <label for="editar-nombre">Nombre</label>
+            <input type="text" id="editar-nombre" name="Nombre" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="editar-telefono">Teléfono</label>
+            <input type="text" id="editar-telefono" name="telefono" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="editar-email">Email</label>
+            <input type="email" id="editar-email" name="email" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="editar-password">Contraseña (opcional)</label>
+            <input type="password" id="editar-password" name="password" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="editar-Tipo_Usuarios_id">Tipo de Usuario</label>
+            <select id="editar-Tipo_Usuarios_id" name="Tipo_Usuarios_id" class="form-control" required>
+              {% for tipo in tipos_usuarios %}
+                <option value="{{ tipo.id }}">{{ tipo.Nombre }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+          <button type="submit" class="btn btn-primary">Actualizar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function cargarDatos(id, nombre, telefono, email, tipoUsuarioId) {
+    document.getElementById('editar-id').value = id;
+    document.getElementById('editar-nombre').value = nombre;
+    document.getElementById('editar-telefono').value = telefono;
+    document.getElementById('editar-email').value = email;
+    document.getElementById('editar-Tipo_Usuarios_id').value = tipoUsuarioId;
+
+    document.getElementById('formEditarUsuario').action = "/usuarios/" + id + "/actualizar";
+}
+</script>
+{% endblock %}

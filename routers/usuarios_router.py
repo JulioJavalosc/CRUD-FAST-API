@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import secrets
+import bcrypt
 from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -16,7 +17,9 @@ from operations.usuarios_operations import (
 from schemas.user import UsuarioCreate, UsuarioResponse, UsuarioUpdate, UsuarioValidate
 from database import get_db
 
-router = APIRouter(prefix="/usuarios", tags=["usuarios"])
+router = APIRouter(prefix="/usuariosa", tags=["usuarios"])
+def verificar_contraseña(contraseña_plana: str, contraseña_hasheada: str) -> bool:
+    return bcrypt.checkpw(contraseña_plana.encode('utf-8'), contraseña_hasheada.encode('utf-8'))
 
 
 @router.get("/", response_model=List[UsuarioResponse])
@@ -36,8 +39,6 @@ def read_usuario(usuario_id: int, db: Session = Depends(get_db)):
 def validate_usuario_route(user_data: dict, request: Request, db: Session = Depends(get_db)):
     email = user_data.get("email")
     password = user_data.get("password")
-
-    # Validar credenciales
     usuario = validate_usuario(db, email=email, password=password)
     if not usuario:
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
@@ -51,11 +52,12 @@ def validate_usuario_route(user_data: dict, request: Request, db: Session = Depe
     request.session.update({
         "user_id": usuario.id,
         "user_name": usuario.Nombre ,
+        "user_type":usuario.Tipo_Usuarios_id,
         "session_id": session_id,
         "access_token": access_token,
         "token_expiry": token_expiry,
     })
-
+    print("DATOS DEL REQUEST",request)
     # Almacenar el session_id en una cookie
     response = JSONResponse(content={"message": "Login successful"})
     response.set_cookie(key="Authorization", value=session_id, httponly=True, secure=True)

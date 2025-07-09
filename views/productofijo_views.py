@@ -23,7 +23,8 @@ async def read_productos(request: Request, db: Session = Depends(get_db)):
     productos = get_productos_fijos(db)
     user = {
         "id": request.session.get("user_id"),
-        "nombre": request.session.get("user_name")
+        "nombre": request.session.get("user_name"),
+        "tipo_usuario":request.session.get("user_type")
     }
     return templates.TemplateResponse("front/productosfijos.html", {"request": request, "productos": productos, "user": user})
 

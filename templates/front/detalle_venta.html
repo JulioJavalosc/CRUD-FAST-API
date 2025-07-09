@@ -1,0 +1,58 @@
+{% extends "front/base.html" %}
+
+
+{% block title %}Blank Page{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <a href="/ventas/listar" class="btn btn-secondary mb-3">&laquo; Volver a Ventas</a>
+  <a href="/ventas/{{ venta.idVenta }}/pdf" target="_blank" class="btn btn-danger mb-3 ms-2"> Generar PDF
+</a>
+  <h1 class="mb-4">Detalles de la Factura</h1>
+  
+  <!-- Información del lote -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      Información de la Venta
+    </div>
+    <div class="card-body">
+      <p><strong>ID:</strong> {{venta.idVenta}}</p>
+      <p><strong>Fecha:</strong> {{venta.Fecha.strftime('%d/%m/%Y %H:%M')}}</p>
+      <p><strong>Cliente:</strong> {{venta.cliente.Nombre}} </p>
+      <p><strong>Usuario:</strong> {{venta.usuario.email}}</p>
+
+      <p><strong>Total:</strong> {{venta.total}}</p>
+    </div>
+  </div>
+
+  <!-- Consumos del lote -->
+  <h2 class="mb-3">Detalle del Venta</h2>
+
+  <table class="table table-bordered table-striped">
+    <thead class="table-info">
+      <tr>
+        <th>ID Detalle</th>
+        <th>Cantidad</th>
+        <th>Subtotal</th>
+        <th>Producto</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for detalle in detalles %}
+      <tr>
+        <td>{{ detalle.idDetalle_Venta }}</td>
+        <td>{{ detalle.Cantidad }}</td>
+        <td>{{ detalle.subtotal }}</td>
+        <td>{{ detalle.idProducto or detalle.idHelado}}</td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+
+</div>
+
+
+{% endblock %}

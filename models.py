@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import VARCHAR, Boolean, CheckConstraint, Column, ForeignKey, Integer, String,DateTime
+from sqlalchemy import VARCHAR, Boolean, CheckConstraint, Column, ForeignKey, Integer, String,DateTime, text
 from database import Base
 from sqlalchemy.orm import declarative_base, relationship
 
@@ -38,6 +38,7 @@ class Usuarios(Base):#Listo
     telefono = Column(String(45), nullable=True)
     email = Column(String(45), nullable=True)
     password = Column(String(45), nullable=False)
+    activo = Column(Boolean, default=True)
     Tipo_Usuarios_id = Column(Integer, ForeignKey('Tipo_Usuarios.id'), nullable=False)
 
     tipo_usuario = relationship("TipoUsuarios", backref="usuarios")
@@ -88,7 +89,7 @@ class DetalleHeladoPersonalizado(Base):
 class Ventas(Base):
     __tablename__ = 'Ventas'
     idVenta = Column(Integer, primary_key=True, autoincrement=True)
-    Fecha = Column(DateTime, nullable=False)
+    Fecha = Column(DateTime, nullable=False, server_default=text("(datetime('now'))"))    
     Clientes_id = Column(Integer, ForeignKey('Clientes.id'), nullable=False)
     total = Column(Integer, nullable=False)
     estado = Column(Integer, nullable=False)
@@ -96,7 +97,6 @@ class Ventas(Base):
 
     cliente = relationship("Clientes", backref="ventas")
     usuario = relationship("Usuarios", backref="ventas")
-
 class DetalleVenta(Base):
     __tablename__ = 'Detalle_Venta'
     idDetalle_Venta = Column(Integer, primary_key=True, autoincrement=True)
@@ -123,9 +123,7 @@ class MovimientosStock(Base):
         CheckConstraint(Tipo_Movimiento.in_([1, 2]), name='check_tipo_movimiento'),
     )
     idUsuario = Column(Integer, ForeignKey('Usuarios.id'), nullable=False)   
-    id_Sabor = Column(Integer, ForeignKey('Sabores_Base.id_Sabor'), nullable=True)
     idProducto = Column(Integer, ForeignKey('Productos_Fijos.idProducto'), nullable=True)
-    sabor_base = relationship("SaboresBase", backref="movimientos_stock")
     producto_fijo = relationship("ProductosFijos", backref="movimientos_stock")
     usuario = relationship("Usuarios", backref="movimientos_stock")
 

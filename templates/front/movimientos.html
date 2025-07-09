@@ -4,7 +4,7 @@
 
 {% block content %}
 <div class="container-fluid">
-    <h2 class="mb-4">Movimientos de Stock</h2>
+    <h2 class="mb-4">Movimientos de Stock de Productos</h2>
     <table class="table table-bordered table-hover">
         <thead class="thead-light">
             <tr>
@@ -29,11 +29,26 @@
                         <span class="badge badge-danger">Salida</span>
                     {% endif %}
                 </td>
-                <td>{{ movimiento.NombreProducto }}</td>
-                <td>{{movimiento.NombreUsuario}}</td>
+                <td>{{ movimiento.producto_fijo.Descripcion }}</td>
+                <td>{{movimiento.usuario.email}}</td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <div class="d-flex justify-content-between mt-4">
+  {% if page > 1 %}
+    <a href="/movimientos?page={{ page - 1 }}&size={{ size }}" class="btn btn-outline-primary">Anterior</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+
+  <span>Página {{ page }} de {{ total_pages }}</span>
+
+  {% if page < total_pages %}
+    <a href="/movimientos?page={{ page + 1 }}&size={{ size }}" class="btn btn-outline-primary">Siguiente</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+</div>
 </div>
 {% endblock %}

@@ -44,3 +44,5 @@ def update_existing_helado_personalizado(helado_id: int, helado_data: HeladoPers
 @router.delete("/{helado_id}")
 def delete_helado_personalizado_route(helado_id: int, db: Session = Depends(get_db)):
     return delete_helado_personalizado(db, helado_id=helado_id)
+
+

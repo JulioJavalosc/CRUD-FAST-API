@@ -1,0 +1,75 @@
+{% extends "front/base.html" %}
+
+{% block title %}Gestión de Sabores Base{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Listado de Ventas</h1>
+
+
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <th>
+                ID
+            </th>
+            <th>
+                Fecha
+            </th>
+            <th>
+                Cliente
+            </th>
+            <th>
+                Total
+            </th>
+            <th>
+                Usuario Encargado
+            </th>
+            <th>
+                Acciones
+            </th>
+        </thead>
+        {% for venta in ventas%}
+        <tr>
+            <td>
+                {{venta.idVenta}}
+            </td>
+            <td>
+                {{venta.Fecha}}
+            </td>
+            <td>
+                {{venta.cliente.Nombre}}
+            </td>
+            <td>
+                {{venta.total}}
+            </td>
+            <td>
+                {{venta.usuario.email}}
+            </td>
+            <td>
+              <a href="/ventas/{{ venta.idVenta }}" class="btn">
+                Ver Detalles
+              </a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+<div class="d-flex justify-content-between mt-4">
+  {% if page > 1 %}
+    <a href="/ventas/listar?page={{ page - 1 }}&size={{ size }}" class="btn btn-outline-primary">Anterior</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+
+  <span>Página {{ page }} de {{ total_pages }}</span>
+
+  {% if page < total_pages %}
+    <a href="/ventas/listar?page={{ page + 1 }}&size={{ size }}" class="btn btn-outline-primary">Siguiente</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+</div>
+
+
+</div>
+
+{% endblock %}

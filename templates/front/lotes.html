@@ -47,7 +47,21 @@
   {% else %}
     <div class="alert alert-warning">No hay lotes registrados.</div>
   {% endif %}
+  <div class="d-flex justify-content-between mt-4">
+  {% if page > 1 %}
+    <a href="/lotes?page={{ page - 1 }}&size={{ size }}" class="btn btn-outline-primary">Anterior</a>
+  {% else %}
+    <span></span>
+  {% endif %}
 
+  <span>Página {{ page }} de {{ total_pages }}</span>
+
+  {% if page < total_pages %}
+    <a href="/lotes?page={{ page + 1 }}&size={{ size }}" class="btn btn-outline-primary">Siguiente</a>
+  {% else %}
+    <span></span>
+  {% endif %}
+</div>
   <a href="/" class="btn btn-secondary mt-3">&laquo; Volver al inicio</a>
 
 </div>

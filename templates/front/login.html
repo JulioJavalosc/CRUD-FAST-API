@@ -36,7 +36,7 @@
                         <!-- Nested Row within Card Body -->
                         <div class="row">
                             <div class="col-lg-6 d-none d-lg-block bg-login-image">
-                               
+
                             </div>
                             <div class="col-lg-6">
                                 <div class="p-5">
@@ -59,8 +59,8 @@
                                                 <label class="custom-control-label" for="customCheck">Recordar</label>
                                             </div>
                                         </div>
-                                        <a href="#"  class="btn btn-primary btn-user btn-block" id="loginLink">
-                                           Iniciar Sesion
+                                        <a href="#" class="btn btn-primary btn-user btn-block" id="loginLink">
+                                            Iniciar Sesion
                                         </a>
                                         <hr>
                                     </form>
@@ -90,21 +90,21 @@
         document.addEventListener('DOMContentLoaded', function () {
             document.getElementById("loginLink").addEventListener('click', async function (event) {
                 event.preventDefault(); // Evita que el formulario se envíe de forma tradicional
-    
+
                 // Obtener los valores del formulario
                 let email = document.getElementById("exampleInputEmail").value;
                 console.log(email)
                 let password = document.getElementById("exampleInputPassword").value;
-    
+
                 // Crear el objeto de datos
                 let data = {
                     email: email,
                     password: password
                 };
-    
+
                 try {
                     // Enviar la solicitud POST al backend
-                    let response = await fetch('http://127.0.0.1:8000/usuarios/validate/', {
+                    let response = await fetch('http://127.0.0.1:8000/usuariosa/validate/', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -112,13 +112,17 @@
                         body: JSON.stringify(data),
                         credentials: 'include' // Incluye cookies en la solicitud
                     });
-    
+
                     if (response.ok) {
                         let result = await response.json();
                         console.log(result);
                         alert("Bienvenido, " + email);
                         window.location.href = "/index"; //Redirigir a la página protegida
-                    } else {
+                    } else if (response.status === 401) {
+                        alert("Credenciales inválidas. Por favor, inténtelo de nuevo.");
+                    }
+
+                    else {
                         let errorData = await response.json();
                         alert("Error: " + errorData.detail[0].msg); // Mostrar mensaje de error
                     }

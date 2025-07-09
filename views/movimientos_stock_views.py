@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Query, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
@@ -13,11 +13,19 @@ router = APIRouter(tags=["Vistas - Movimientos Stock"])
 
 
 @router.get("/movimientos", response_class=HTMLResponse)
-async def movimientos_stock_view(request: Request, db: Session = Depends(get_db)):
-    movimientos = get_movimientos_stock(db)
+async def movimientos_stock_view(request: Request, db: Session = Depends(get_db) , page: int = Query(1, ge=1),
+    size: int = Query(10, ge=1, le=100)):
+    skip = (page - 1) * size
+    total = db.query(MovimientosStock).count()
+    movimientos = db.query(MovimientosStock).offset(skip).limit(size).all()
+
     user = {
         "id": request.session.get("user_id"),
-        "nombre": request.session.get("user_name")
+        "nombre": request.session.get("user_name"),
+        "tipo_usuario":request.session.get("user_type")
     }
 
-    return templates.TemplateResponse("front/movimientos.html", {"request": request, "movimientos": movimientos, "user": user})
+    return templates.TemplateResponse("front/movimientos.html", {"request": request, "movimientos": movimientos, "user": user,"page": page,
+        "size": size,
+        "total": total,
+        "total_pages": (total + size - 1) // size})

@@ -8,13 +8,16 @@ logging.basicConfig(level=logging.INFO)
 async def session_middleware(request: Request, call_next):
     logging.info(f"Solicitud recibida para ruta: {request.url.path}")
 
+    # Excluir archivos estáticos
+    if request.url.path.startswith("/static/"):
+        return await call_next(request)
+
     # Rutas públicas (sin validación de sesión)
-    public_routes = ["/", "/usuarios/validate/", "/logout/", "/favicon.ico", "/docs", "/login"]
+    public_routes = ["/", "/usuariosa/validate/", "/logout/", "/favicon.ico", "/docs", "/login"]
     
     if request.url.path in public_routes:
         logging.info(f"Ruta pública detectada: {request.url.path}")
-        response = await call_next(request)
-        return response
+        return await call_next(request)
 
     try:
         if not request.session.get("user_id"):
@@ -26,5 +29,4 @@ async def session_middleware(request: Request, call_next):
         logging.error(f"Error inesperado en middleware: {e}")
         return RedirectResponse(url="/")
 
-    response = await call_next(request)
-    return response
+    return await call_next(request)

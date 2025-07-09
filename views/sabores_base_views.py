@@ -16,8 +16,16 @@ router = APIRouter(tags=["Sabores Base - Web"])
 templates = Jinja2Templates(directory="templates")
 @router.get("/sabores-base", response_class=HTMLResponse)
 def read_sabores(request: Request, db: Session = Depends(get_db)):
+    user_id = request.session.get("user_id")
+    nombre_usuario = request.session.get("user_name")
+    tipo_usuario = request.session.get("user_type")
+    user = {
+        "id": user_id,
+        "nombre": nombre_usuario,
+        "tipo_usuario":tipo_usuario
+    }
     sabores = get_sabores_base(db)
-    return templates.TemplateResponse("front/sabores.html", {"request": request, "sabores": sabores})
+    return templates.TemplateResponse("front/sabores.html", {"request": request, "sabores": sabores , "user":user})
 @router.get("/sabores-base/{sabor_id}", response_class=HTMLResponse)
 def read_sabor(request: Request, sabor_id: int, db: Session = Depends(get_db)):
     sabor = get_sabor_base(db, sabor_id=sabor_id)

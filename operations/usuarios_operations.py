@@ -1,3 +1,4 @@
+import bcrypt
 from fastapi import HTTPException
 from models import Usuarios
 from schemas.user import UsuarioCreate, UsuarioUpdate, UsuarioValidate
@@ -49,7 +50,14 @@ def delete_usuario(db: Session, usuario_id: int):
 
 
 def validate_usuario(db: Session, email: str, password: str):
-    db_usuario = db.query(Usuarios).filter(Usuarios.email == email).first()
-    if db_usuario and db_usuario.password == password:
+    db_usuario = db.query(Usuarios).filter(
+        Usuarios.email == email,
+        Usuarios.activo == True
+    ).first()
+
+    if db_usuario and bcrypt.checkpw(password.encode('utf-8'), db_usuario.password.encode('utf-8')):
+        print("USUARIO VÁLIDO")
         return db_usuario
-    return None
+    else:
+        print("USUARIO INEXISTENTE O CONTRASEÑA INVÁLIDA")
+        return None
