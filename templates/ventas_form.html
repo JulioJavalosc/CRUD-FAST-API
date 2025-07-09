@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Informe Anual de Ventas</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1, h2 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+    th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+    th { background-color: #f0f0f0; }
+    .total-mes { font-weight: bold; text-align: right; padding-right: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Informe Anual de Ventas</h1>
+  <p>Año: {{ anio }}</p>
+  <p>Fecha de generación: {{ fecha }}</p>
+    <p>Usuario solicitante: {{encargado}}</p>
+  {% for mes_data in resumen_mensual %}
+    <h2>{{ mes_data.nombre_mes }}</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad Vendida</th>
+          <th>Total Generado</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in mes_data.productos %}
+        <tr>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.cantidad }}</td>
+          <td>{{ producto.total }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td colspan="2" class="total-mes">Total del Mes</td>
+          <td><strong>{{ mes_data.total_mes }}</strong></td>
+        </tr>
+      </tbody>
+    </table>
+  {% endfor %}
+
+  <h2>Total General del Año: {{ total_anual }}</h2>
+</body>
+</html>

@@ -10,8 +10,11 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <h1 class="h3 mb-0 text-gray-800">Estadisticas</h1>
+            {% if user.tipo_usuario == 1 %}
+             <a href="reportes/ventas-anuales/pdf" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+                                class="fas fa-download fa-sm text-white-50"></i> Generar Reporte</a>
+            {% endif %}
         </div>
-
         <!-- Content Row -->
         <div class="row">
 
@@ -41,7 +44,7 @@
                         <div class="row no-gutters align-items-center">
                             <div class="col mr-2">
                                 <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                    Gancias(Anual)</div>
+                                    Ganacias(Anual)</div>
                                 <div class="h5 mb-0 font-weight-bold text-gray-800">₲{{
                                     "{:,.0f}".format(ganancias_anuales) }}</div>
                             </div>

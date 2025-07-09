@@ -1,3 +1,4 @@
+from calendar import month_name
 from datetime import datetime
 import json
 from typing import List, Optional
@@ -5,6 +6,7 @@ from fastapi import APIRouter, Form, HTTPException, Query, Request, Depends, Res
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, FileSystemLoader
+from sqlalchemy import extract
 from sqlalchemy.orm import Session
 
 from models import Clientes, ConsumoLoteHelado, DetalleHeladoPersonalizado, DetalleVenta, HeladosPersonalizados, LotesSaboresBase, MovimientosStock, ProductosFijos,SaboresBase, Ventas
@@ -325,4 +327,79 @@ def generar_pdf_venta(id_venta: int, db: Session = Depends(get_db)):
         content=pdf_bytes,
         media_type="application/pdf",
         headers={"Content-Disposition": f"inline; filename=venta_{venta.idVenta}.pdf"}
+    )
+
+
+@router.get("/reportes/ventas-anuales/pdf")
+def generar_informe_anual_pdf(request: Request,db: Session = Depends(get_db)):
+    
+    anio = datetime.now().year
+    resumen_mensual = []
+    total_anual = 0
+
+    user = {
+        "id": request.session.get("user_id"),
+        "nombre": request.session.get("user_name"),
+        "tipo_usuario":request.session.get("user_type")
+    }
+    for mes in range(1, 13):
+        ventas_mes = db.query(DetalleVenta).join(Ventas).filter(
+            extract("month", Ventas.Fecha) == mes,
+            extract("year", Ventas.Fecha) == anio
+        ).all()
+
+        productos_resumen = {}
+        total_mes = 0
+
+        for detalle in ventas_mes:
+            if detalle.idProducto:
+                producto = db.query(ProductosFijos).get(detalle.idProducto)
+                if producto:
+                    nombre = producto.Descripcion
+                    if nombre not in productos_resumen:
+                        productos_resumen[nombre] = {
+                            "cantidad": 0,
+                            "total": 0
+                        }
+                    productos_resumen[nombre]["cantidad"] += detalle.Cantidad
+                    productos_resumen[nombre]["total"] += detalle.subtotal
+                    total_mes += detalle.subtotal
+
+        productos_list = [
+            {
+                "nombre": nombre,
+                "cantidad": datos["cantidad"],
+                "total": datos["total"]
+            }
+            for nombre, datos in productos_resumen.items()
+        ]
+
+        resumen_mensual.append({
+            "nombre_mes": month_name[mes],
+            "productos": productos_list,
+            "total_mes": total_mes
+        })
+
+        total_anual += total_mes
+
+    # Renderizar PDF
+    template = env.get_template("ventas_form.html")
+    html_content = template.render(
+        resumen_mensual=resumen_mensual,
+        total_anual=total_anual,
+        anio=anio,
+        fecha=datetime.now().strftime("%d/%m/%Y"),
+        encargado = user["nombre"] , 
+    )
+
+    buffer = io.BytesIO()
+    pisa_status = pisa.CreatePDF(html_content, dest=buffer)
+    if pisa_status.err:
+        return {"error": "No se pudo generar el PDF"}
+
+    buffer.seek(0)
+    return Response(
+        content=buffer.read(),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"inline; filename=informe_ventas_{anio}.pdf"}
     )
